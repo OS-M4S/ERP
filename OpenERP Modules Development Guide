@@ -1,10 +1,135 @@
-Install the following plateforms / tool for OpenERP modules development:
+IThis post helps to setup OpenERP 7.0 Development Environment in Ubuntu.
+For this development, I am using “ubuntu-12.04.1-desktop-amd64”. I have divided the steps in the following categories
+1.	Install Python 
+2.	Install required tools for python 
+3.	Install Aptana Studio 
+4.	Download OpenERP Source Code from bzr 
+5.	Configure and Install Postgres 
+6.	Configure OpenERP in Aptana Studio and Run 
+Install Python
+Step 1: Here is the command to install python
+sudo apt-get install python
+Install required tools for python
+Step 2: Here is the command to Required tools for OpenERP
+sudo apt-get install python-dateutil python-docutils python-feedparser python-gdata python-jinja2 python-ldap python-libxslt1 python-lxml python-mako python-mock python-openid python-psycopg2 python-psutil python-pybabel python-pychart python-pydot python-pyparsing python-reportlab python-simplejson python-tz python-unittest2 python-vatnumber python-vobject python-webdav python-werkzeug python-xlwt python-yaml python-zsi
+The above command installs all the tools except gdata. Here is the command to install.
+sudo apt-get install python-pip
+sudo pip install gdata --upgrade
+Install Aptana Studio
+Step 3:  Please download the aptana studio from the website 
+http://www.aptana.com/products/studio3/download
+The Aptana Studio files are in zip format. If you do not have the zip installed. Here is the command to do that.
+sudo apt-get install zip unzip
+The following is the command to unzip the downloaded aptana file.
+sudo unzip Aptana_Studio_3_Setup_Linux_x86_64_3.4.2.zip
+To create a desktop shortcut, please follow the command otherwise you can move to next step
+3.1 Change the name of the Aptana Folder
+sudo mv Aptana_Studio_3_Setup_Linux_x86_64_3.4.2 aptana
+3.2 Move Aptana to opt folder
+sudo mv "aptana" /opt
+3.3 Create Softlink
+sudo ln -s "/opt/apata/AptanaStudio3" /usr/bin/aptana
+3.4 Create Desktop Shortcut
+Use nano or other to create a file. The command is
+sudo nano /usr/share/applications/aptana.desktop
+The contents of the file are
+[Desktop Entry]
+Name=Eclipse IDE
+Comment=Eclipse IDE
+Exec=/opt/eclipse/eclipse
+Terminal=false
+Type=Application
+Icon=/opt/eclipse/icon.xpm
+Categories=Development;
+Download OpenERP Source Code from bzr
+Step 4: Here are the following command to install Bazar and download OpenERP code
+sudo ap-get install bzr
+sudo bzr branch http://launchpad.net/openobject-addons/7.0 addons
+sudo bzr branch http://launchpad.net/openobject-server/7.0 server
+sudo bzr branch http://launchpad.net/openerp-web/7.0 web
 
-1. Windows 7 / Ubuntu 12.04 LTS
-2. OpenERP 7
-3. Eclipse 
-  A. PyDev eclipse addon
+Note: if you are not able to download it from the above then download the OpenERP source code form http://www.openerp.com/Downloads
+Confgure and Install Postgres
+Step 5: Command to install Postgres
+Install the Postgres
+sudo apt-get install postgresql postgresql-contrib
+The next two steps is mainly useful if you want to manage the postgres remotely. For instance, if you want to take the daily backup of your postgres db from your system or you want to issue any SQL Statements remotely.
+Step 3: We need to tell Postgres that we will use the password to connect to the DB from any IP address to access it.
+Open the file in vi editor.
+sudo vi /etc/postgresql/9.1/main/pg_hba.conf
+Look for # IPv4 local connections in the above file. Replace the line with the below one
+host    all         all         0.0.0.0/0          password
+Step 4: This step asks the Postgres to accept connection from any address
+Open the file vi editor
+sudo nano /etc/postgresql/9.1/main/postgresql.conf
+Look for listen_address=’localhost’ and replace with
+listen_addresses = '*' 
+At the time of writing, it was in 59th line.
+That’s it. Postgres installed successfully.  To Start the service, use the following command
+sudo service postgresql start
+Step 5: In order to connect to the Postgres remotely. we need to change the DB username. This step will do that.
+Change the postgres user password
+sudo passwd postgres
+Change SU to postgres
+su postgres
+Login to PSQL to Change the postgres password
+psql
+ALTER USER postgres WITH PASSWORD 'abcABC';
+\q is the command to exit
+Install the PgAdmin 
+sudo apt-get install pgadmin3
+
+Debugging OpenERP with Aptana or Eclipse with PyDev
+Set the Python Interpreter
+From System Preferences > PyDev > Interpreter – Python
+Set the python interpreter to the python executable program that is used on your system: <path>/python.exe, /usr/bin/python, or /opt/local/bin/python.
+On Linux/Mac, you can use the command line: which python to find the full path of python executable.
+Once setup, the existing module on your system will be listed on the System PYTHONPATH box.
   
-4. PostgreSQL
-  A. pgAdmin
+Click Apply.
+Click OK.
+Import OpenERP Source Code into Project
+From File à Import à select Existing Folder as a New Project.
   
+Click Next.
+Select the OpenERP root folder.
+  
+Click Finish.
+The project will appear at the PyDev Package Explorer. Make sure it’s set to PyDev Project.
+Right-click on the OpenERP project à PyDev à Set as PyDev Project.
+  
+Run or Debug openerp-server file
+From PyDev Package Explorer, right click on the opener-server file below the Project the you want to Run or Debug.
+  
+Then click Python Run.
+OpenERP will run on Aptana/Eclipse.
+ 
+  
+Click Stop button to stop OpenERP.
+Once run, the Aptana will generate what’s called by Debug Configuration ie all configurations that are needed to run the openerp-server from inside the Aptana environment.
+Modify Debug Configuration
+If you need, you can modify the debug configuration provided, for example to add command parameter on openerp-server.
+Click on Arguments tab and add the additional parameters to run opener-server, for example:
+•	-c opener-server.conf to set the running configuration of OpenERP
+•	–update=yourmodule to update your module on openerp
+•	–addon_path=youraddons, to set the addon paths
+•	etc
+  
+You can directly debug OpenERP from here by clicking the Debug button.
+  
+And make sure the OpenERP logs show the correct configurations after you setup the debug configuration parameters.
+Setup Break Point and Debug
+Go to the source code file that you want to debug, right click on the line number and click Add Breakpoint.
+  
+Debug OpenERP as described above.
+Open your browser and go to OpenERP URL as usual (localhost:8069) and login to the database that has the module you want to debug.
+If the breakpoint is hit, then Aptana will activate the debug prespective.
+  
+Click Yes.
+Now we can see all information that we need to do the debugging:
+  
+Step one line by pressing Step Over (F6) key.
+Step into function by pressing Step Into (F5) key
+Terminate debugging by pressing Terminate button.
+Continue running the program by Resume button.
+
