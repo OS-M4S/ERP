@@ -1,4 +1,4 @@
-IThis post helps to setup OpenERP 7.0 Development Environment in Ubuntu.
+This post helps to setup OpenERP 7.0 Development Environment in Ubuntu.
 For this development, I am using “ubuntu-12.04.1-desktop-amd64”. I have divided the steps in the following categories
 1.	Install Python 
 2.	Install required tools for python 
